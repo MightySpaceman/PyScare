@@ -1,5 +1,5 @@
 # PyScare V1.1
-Grabs a bunch of your details (ripped from my [UltimateGrabber](https://github.com/MightySpaceman/UltimateGrabber) project) and sets it as your desktop background, as well as a note from 'anonymous'. In the background is an inverted, grascale picture taken from your webcam. An issue is preventing me from bundling it into an EXE for now, but you can still run the source code or use [Version 1.0](https://github.com/MightySpaceman/PyScare/releases/V1.0) instead.
+Harmless jokeware. Grabs a bunch of your details (ripped from my [UltimateGrabber](https://github.com/MightySpaceman/UltimateGrabber) project) and sets it as your desktop background, as well as a note from 'anonymous'. In the background is an inverted, grascale picture taken from your webcam. An issue is preventing me from bundling it into an EXE for now, but you can still run the source code or use [Version 1.0](https://github.com/MightySpaceman/PyScare/releases/V1.0) instead.
 
 You can change the cover icon of the EXE using a tool such as [Resource Hacker](http://www.angusj.com/resourcehacker/#download) if you please.
 
